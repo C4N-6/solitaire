@@ -1,0 +1,23 @@
+#ifndef CAN_SUIT_PILE_H
+#define CAN_SUIT_PILE_H
+
+#include "card.h"
+#include <ostream>
+class SuitPile {
+  Card::Suit m_suit{};
+  int m_currntCard{0};
+
+public:
+  SuitPile() {}
+  std::optional<Card> peek() const;
+  std::optional<Card> pop();
+  bool canAdd(const Card card) const;
+  bool add(const Card card);
+  bool empty() const { return !m_currntCard; }
+};
+
+inline std::ostream &operator<<(std::ostream &cout, const SuitPile &suitPile) {
+  return cout << suitPile.peek();
+}
+
+#endif // !CAN_SUIT_PILE_H
