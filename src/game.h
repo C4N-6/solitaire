@@ -1,12 +1,13 @@
 #ifndef CAN_GAME_H
 #define CAN_GAME_H
-#include "SuitPile.h"
 #include "deck.h"
+#include "suitPile.h"
 
+#include <array>
 #include <ostream>
 class Game {
   Deck m_deck{};
-  SuitPile m_suitPiles[4]{};
+  std::array<SuitPile, 4> m_suitPiles{};
 
 public:
   friend int main(int argc, char *argv[]);

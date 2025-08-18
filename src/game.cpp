@@ -1,4 +1,4 @@
-#include "Game.h"
+#include "game.h"
 #include <iterator>
 
 std::ostream &operator<<(std::ostream &cout, const Game &game) {

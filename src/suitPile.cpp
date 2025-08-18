@@ -1,4 +1,4 @@
-#include "SuitPile.h"
+#include "suitPile.h"
 #include "card.h"
 
 #include <algorithm>

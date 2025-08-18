@@ -1,5 +1,5 @@
-#include "Game.h"
 #include "card.h"
+#include "game.h"
 #include <iostream>
 
 int main(int argc, char *argv[]) {
