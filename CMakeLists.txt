@@ -10,6 +10,7 @@ set(PROJECT_SOURCES
   src/main.cpp
   src/SuitPile.cpp
   src/Game.cpp
+  src/cardStack.cpp
 )
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
