@@ -2,6 +2,7 @@
 #define CAN_DECK_H
 
 #include "card.h"
+
 #include <list>
 #include <ostream>
 #include <vector>
@@ -15,6 +16,8 @@ public:
   Deck();
 
   void draw();
+  Card take();
+  Card drawAndTake();
 
   void shufle();
 

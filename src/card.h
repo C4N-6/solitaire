@@ -8,16 +8,19 @@
 class Card {
 public:
   enum class Suit {
+    none,
     club,
     spade,
     heart,
     diamond,
   };
   enum class Color {
+    none,
     red,
     black,
   };
   enum class Face {
+    none,
     ace = 1,
     two,
     three,

@@ -6,6 +6,16 @@
 #include <optional>
 #include <vector>
 
+std::optional<Card> CardStack::at(size_t index) const {
+  if (index >= m_closedCards.size()) {
+    if (m_closedCards.size() - index < m_openCards.size()) {
+      return m_openCards.at(m_closedCards.size() - index);
+    }
+    return {};
+  }
+  return Card();
+}
+
 void CardStack::addClosedCard(Card closedCard) {
   m_closedCards.push_back(closedCard);
 }
@@ -22,7 +32,7 @@ bool CardStack::canAddOpenCard(std::optional<Card> oldOpenCard, Card openCard) {
               static_cast<int>(openCard.getFace()) + 1 &&
           oldOpenCard.value().getColor() != openCard.getColor());
 }
-bool CardStack::canAddOpenCard(Card openCard) {
+bool CardStack::canAddOpenCard(Card openCard) const {
   if (m_openCards.empty()) {
     return canAddOpenCard(std::optional<Card>{}, openCard);
   }

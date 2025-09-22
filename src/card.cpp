@@ -1,8 +1,11 @@
 #include "card.h"
 
 #include <string>
+
 Card::Color Card::getColor(Card::Suit suit) {
   switch (suit) {
+  case Suit::none:
+    return Card::Color::none;
   case Suit::club:
   case Suit::spade:
     return Color::black;
@@ -23,6 +26,8 @@ std::string Card::str() const {
 
 std::string operator+(const Card::Suit suit) {
   switch (suit) {
+  case Card::Suit::none:
+    return "\u2588";
   case Card::Suit::club:
     return "\u2667"; // ♧
   case Card::Suit::spade:
@@ -35,6 +40,8 @@ std::string operator+(const Card::Suit suit) {
 }
 std::string operator+(const Card::Face face) {
   switch (face) {
+  case Card::Face::none:
+    return "\u2588\u2588";
   case Card::Face::ace:
     return "1 ";
   case Card::Face::two:

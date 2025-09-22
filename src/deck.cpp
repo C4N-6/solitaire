@@ -7,9 +7,11 @@
 #include <random>
 
 Deck::Deck() {
-  for (int i{0}; i <= static_cast<int>(Card::Suit::diamond); i++) {
+  for (int i{static_cast<int>(Card::Suit::club)};
+       i <= static_cast<int>(Card::Suit::diamond); i++) {
     Card::Suit suit{static_cast<Card::Suit>(i)};
-    for (int j{1}; j <= static_cast<int>(Card::Face::king); j++) {
+    for (int j{static_cast<int>(Card::Face::ace)};
+         j <= static_cast<int>(Card::Face::king); j++) {
       Card::Face face{static_cast<Card::Face>(j)};
       m_deck.push_back(Card{suit, face});
     }
@@ -36,6 +38,15 @@ void Deck::draw() {
     m_deckPile.push_back(m_deck.back());
     m_deck.pop_back();
   }
+}
+Card Deck::take() {
+  Card returnVar{m_deckPile.back()};
+  m_deckPile.pop_back();
+  return returnVar;
+}
+Card Deck::drawAndTake() {
+  draw();
+  return take();
 }
 
 std::ostream &operator<<(std::ostream &cout, const Deck &deck) {
