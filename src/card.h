@@ -50,6 +50,8 @@ public:
   std::string str() const;
 };
 
+std::string getColorEscSeq(const Card::Color &color);
+
 inline std::ostream &operator<<(std::ostream &cout, const Card &card) {
   return cout << card.str();
 }

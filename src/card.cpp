@@ -18,10 +18,19 @@ Card::Color Card::getColor(Card::Suit suit) {
 #define RESET_FORMATING "\033[0m"
 #define RED_FORMATING "\033[31m"
 #define BLACK_FORMATING "\033[37m"
+inline std::string getColorEscSeq(const Card::Color &color) {
+  switch (color) {
+  case Card::Color::none:
+    return RESET_FORMATING;
+  case Card::Color::red:
+    return RED_FORMATING;
+  case Card::Color::black:
+    return BLACK_FORMATING;
+  }
+}
 
 std::string Card::str() const {
-  return (getColor() == Color::red ? RED_FORMATING : BLACK_FORMATING) +
-         (+m_suit) + (+m_face) + RESET_FORMATING;
+  return getColorEscSeq(getColor()) + (+m_suit) + (+m_face) + RESET_FORMATING;
 }
 
 std::string operator+(const Card::Suit suit) {
