@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <iomanip>
 #include <iostream>
 #include <optional>
 #include <random>
@@ -18,12 +19,12 @@ Deck::Deck() {
     }
   }
 
-  shufle();
+  shuffle();
 
   assert(m_deck.size() == 52 && "Is the deck a full deck");
 }
 
-void Deck::shufle() {
+void Deck::shuffle() {
   std::mt19937 s_generator(std::random_device{}());
 
   std::shuffle(m_deck.begin(), m_deck.end(), s_generator);
@@ -60,7 +61,8 @@ std::ostream &operator<<(std::ostream &cout, const Deck &deck) {
   if (deck.m_deck.empty()) {
     cout << "   ";
   } else {
-    cout << "\u2588\u2588 "; // █ full block
+    cout << "\033[7m" << std::setw(2) << deck.m_deck.size()
+         << "\033[27m "; // █ full block
   }
   if (deck.m_deckPile.empty()) {
     cout << "   ";

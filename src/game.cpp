@@ -95,6 +95,7 @@ Game::userErrors Game::move(const std::string_view from,
       return userErrors::invalid_move;
     }
   } else if (from.at(0) >= '1' && from.at(0) <= '7') {
+    // TODO: add the option to chose a select number of cards
     CardStack &cardStack{m_cardStack.at(from.at(0) - '1')};
     movingCard = cardStack.peekOpenCards(cardStack.noOfOpenCards());
   }
@@ -132,8 +133,7 @@ Game::userErrors Game::move(const std::string_view from,
     m_suitPiles.at(3).add(movingCard.at(0));
   }
 
-  // TODO: Game::move(const std::string_view, const std::string_view) remove the
-  // moved cards
+  // remove the cards
   if (from.at(0) == 'd') {
     m_deck.take();
   } else if (from.at(0) == 'w') {

@@ -21,7 +21,7 @@ public:
   std::optional<Card> take();
   std::optional<Card> drawAndTake();
 
-  void shufle();
+  void shuffle();
 
   friend std::ostream &operator<<(std::ostream &cout, const Deck &deck);
 };

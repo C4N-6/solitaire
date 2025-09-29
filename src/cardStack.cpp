@@ -39,18 +39,17 @@ bool CardStack::canAddOpenCard(Card openCard) const {
   return canAddOpenCard(m_openCards.back(), openCard);
 }
 bool CardStack::addOpenCards(std::vector<Card> &openCard) {
-  if (openCard.empty() || !canAddOpenCard(openCard.back())) {
+  if (openCard.empty() || !canAddOpenCard(openCard.front())) {
     return false;
   }
   for (size_t i{openCard.size() - 2}; i < openCard.size(); i--) {
-    if (!canAddOpenCard(openCard.at(i + 1), openCard.at(i))) {
+    if (!canAddOpenCard(openCard.at(i), openCard.at(i + 1))) {
       return false;
     }
   }
 
-  while (!openCard.empty()) {
-    m_openCards.push_back(openCard.back());
-    openCard.pop_back();
+  for (size_t i{0}; i < openCard.size(); i++) {
+    m_openCards.push_back(openCard.at(i));
   }
 
   return true;
@@ -59,7 +58,7 @@ std::vector<Card> CardStack::peekOpenCards(size_t noOfOpenCards) const {
   noOfOpenCards = std::min(noOfOpenCards, m_openCards.size());
   std::vector<Card> removedCards{};
   for (size_t i{0}; i < noOfOpenCards; i++) {
-    removedCards.push_back(m_openCards.back());
+    removedCards.push_back(m_openCards.at(i));
   }
   return removedCards;
 }
