@@ -14,6 +14,9 @@ public:
   bool canAdd(const Card card) const;
   bool add(const Card card);
   bool empty() const { return !m_currntCard; }
+  bool filedUp() const {
+    return m_currntCard == static_cast<int>(Card::Face::king);
+  }
 };
 
 inline std::ostream &operator<<(std::ostream &cout, const SuitPile &suitPile) {

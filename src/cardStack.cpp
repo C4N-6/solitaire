@@ -7,13 +7,13 @@
 #include <vector>
 
 std::optional<Card> CardStack::at(size_t index) const {
-  if (index >= m_closedCards.size()) {
-    if (m_closedCards.size() - index < m_openCards.size()) {
-      return m_openCards.at(m_closedCards.size() - index);
-    }
-    return {};
+  if (index < m_closedCards.size()) {
+    return Card();
   }
-  return Card();
+  if (index < m_openCards.size() + m_closedCards.size()) {
+    return m_openCards.at(index - m_closedCards.size());
+  }
+  return {};
 }
 
 void CardStack::addClosedCard(Card closedCard) {
@@ -54,6 +54,14 @@ bool CardStack::addOpenCards(std::vector<Card> &openCard) {
   }
 
   return true;
+}
+std::vector<Card> CardStack::peekOpenCards(size_t noOfOpenCards) const {
+  noOfOpenCards = std::min(noOfOpenCards, m_openCards.size());
+  std::vector<Card> removedCards{};
+  for (size_t i{0}; i < noOfOpenCards; i++) {
+    removedCards.push_back(m_openCards.back());
+  }
+  return removedCards;
 }
 std::vector<Card> CardStack::takeOpenCards(size_t noOfOpenCards) {
   noOfOpenCards = std::min(noOfOpenCards, m_openCards.size());

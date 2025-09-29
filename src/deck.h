@@ -4,6 +4,7 @@
 #include "card.h"
 
 #include <list>
+#include <optional>
 #include <ostream>
 #include <vector>
 
@@ -16,8 +17,9 @@ public:
   Deck();
 
   void draw();
-  Card take();
-  Card drawAndTake();
+  std::optional<Card> peek() const;
+  std::optional<Card> take();
+  std::optional<Card> drawAndTake();
 
   void shufle();
 

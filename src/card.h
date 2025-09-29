@@ -43,6 +43,7 @@ private:
 public:
   Card() {}
   Card(Suit suit, Face face) : m_suit{suit}, m_face{face} {}
+  Card(const Card &card) : m_suit{card.m_suit}, m_face{card.m_face} {}
   static Color getColor(Suit suit);
   Color getColor() const { return getColor(m_suit); }
   Suit getSuit() const { return m_suit; }

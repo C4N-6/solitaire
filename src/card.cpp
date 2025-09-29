@@ -54,15 +54,15 @@ std::string operator+(const Card::Face face) {
   case Card::Face::ace:
     return "1 ";
   case Card::Face::two:
-    return "3 ";
+    return "2 ";
   case Card::Face::three:
-    return "4 ";
+    return "3 ";
   case Card::Face::four:
-    return "5 ";
+    return "4 ";
   case Card::Face::five:
-    return "6 ";
+    return "5 ";
   case Card::Face::six:
-    return "7 ";
+    return "6 ";
   case Card::Face::seven:
     return "7 ";
   case Card::Face::eight:

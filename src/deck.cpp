@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cassert>
 #include <iostream>
+#include <optional>
 #include <random>
 
 Deck::Deck() {
@@ -28,6 +29,10 @@ void Deck::shufle() {
   std::shuffle(m_deck.begin(), m_deck.end(), s_generator);
 }
 
+std::optional<Card> Deck::peek() const {
+  return m_deckPile.empty() ? std::optional<Card>{} : m_deckPile.back();
+}
+
 void Deck::draw() {
   if (m_deck.empty()) {
     while (!m_deckPile.empty()) {
@@ -39,12 +44,14 @@ void Deck::draw() {
     m_deck.pop_back();
   }
 }
-Card Deck::take() {
-  Card returnVar{m_deckPile.back()};
-  m_deckPile.pop_back();
+std::optional<Card> Deck::take() {
+  std::optional<Card> returnVar{peek()};
+  if (returnVar.has_value()) {
+    m_deckPile.pop_back();
+  }
   return returnVar;
 }
-Card Deck::drawAndTake() {
+std::optional<Card> Deck::drawAndTake() {
   draw();
   return take();
 }

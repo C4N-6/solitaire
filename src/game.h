@@ -15,15 +15,24 @@ class Game {
   std::array<CardStack, 7> m_cardStack{};
 
 public:
-  enum class userErrors { no_error, blank_command, command_not_found };
+  enum class userErrors {
+    no_error,
+    blank_command,
+    command_not_found,
+    command_formating,
+    register_not_found,
+    invalid_move,
+  };
   Game();
   void refresh();
+  size_t longestCardStackLen() const;
   userErrors move(const std::string_view from, const std::string_view to);
   void draw() { m_deck.draw(); }
   userErrors command(const std::string_view command);
   bool isGameOver() const;
   friend std::ostream &operator<<(std::ostream &cout, const Game &game);
 };
+
 inline void clearPreviousLines(int lines) {
   for (int i = 0; i < lines; ++i) {
     std::cout << "\033[F\033[2K"; // Move up and clear line

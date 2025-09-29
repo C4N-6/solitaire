@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
     Game::userErrors commandError{game.command(command)};
     if (commandError == Game::userErrors::command_not_found &&
         command.at(0) == 'q') {
-      std::cout << "quiting game" << std::endl;
+      std::cout << "quitting game" << std::endl;
       goto endGame;
     } else if (commandError != Game::userErrors::no_error) {
       std::cout << command << ": " << errorToString(commandError) << std::endl;
