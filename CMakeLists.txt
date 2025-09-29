@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 4.1.0)
 
-project(Solitare CXX)
+project(solitaire CXX VERSION 1.0.0)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -15,6 +15,10 @@ set(PROJECT_SOURCES
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 
+install(
+  TARGETS ${PROJECT_NAME}
+  DESTINATION bin
+)
 add_custom_target(
   run
   COMMAND ${PROJECT_NAME}

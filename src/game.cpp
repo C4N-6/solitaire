@@ -11,6 +11,7 @@
 #include <iterator>
 #include <limits>
 #include <optional>
+#include <string>
 #include <string_view>
 #include <vector>
 
@@ -95,9 +96,12 @@ Game::userErrors Game::move(const std::string_view from,
       return userErrors::invalid_move;
     }
   } else if (from.at(0) >= '1' && from.at(0) <= '7') {
-    // TODO: add the option to chose a select number of cards
     CardStack &cardStack{m_cardStack.at(from.at(0) - '1')};
-    movingCard = cardStack.peekOpenCards(cardStack.noOfOpenCards());
+    unsigned long numberOfCardsToTake{cardStack.noOfOpenCards()};
+    if (from.size() >= 3) {
+      numberOfCardsToTake = std::stoi(static_cast<std::string>(from.substr(2)));
+    }
+    movingCard = cardStack.peekOpenCards(numberOfCardsToTake);
   }
 
   // find if we can move those cards
@@ -146,7 +150,11 @@ Game::userErrors Game::move(const std::string_view from,
     m_suitPiles.at(3).pop();
   } else if (from.at(0) >= '1' && from.at(0) <= '7') {
     CardStack &cardStack{m_cardStack.at(from.at(0) - '1')};
-    cardStack.takeOpenCards(cardStack.noOfOpenCards());
+    unsigned long numberOfCardsToTake{cardStack.noOfOpenCards()};
+    if (from.size() >= 3) {
+      numberOfCardsToTake = std::stoi(static_cast<std::string>(from.substr(2)));
+    }
+    movingCard = cardStack.takeOpenCards(numberOfCardsToTake);
   } else {
     return userErrors::register_not_found;
   }

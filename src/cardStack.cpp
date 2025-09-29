@@ -55,11 +55,13 @@ bool CardStack::addOpenCards(std::vector<Card> &openCard) {
   return true;
 }
 std::vector<Card> CardStack::peekOpenCards(size_t noOfOpenCards) const {
-  noOfOpenCards = std::min(noOfOpenCards, m_openCards.size());
   std::vector<Card> removedCards{};
-  for (size_t i{0}; i < noOfOpenCards; i++) {
+
+  for (size_t i{m_openCards.size() - noOfOpenCards}; i < m_openCards.size();
+       i++) {
     removedCards.push_back(m_openCards.at(i));
   }
+
   return removedCards;
 }
 std::vector<Card> CardStack::takeOpenCards(size_t noOfOpenCards) {
