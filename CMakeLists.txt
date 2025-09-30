@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 4.1.0)
 
-project(solitaire CXX VERSION 1.0.0)
+project(solitaire LANGUAGES CXX VERSION 1.0.1)
 
 set(CMAKE_CXX_STANDARD 17)
 

@@ -98,8 +98,12 @@ Game::userErrors Game::move(const std::string_view from,
   } else if (from.at(0) >= '1' && from.at(0) <= '7') {
     CardStack &cardStack{m_cardStack.at(from.at(0) - '1')};
     unsigned long numberOfCardsToTake{cardStack.noOfOpenCards()};
+    char toChar{to.at(0)};
     if (from.size() >= 3) {
       numberOfCardsToTake = std::stoi(static_cast<std::string>(from.substr(2)));
+    } else if (toChar == 'w' || toChar == 'e' || toChar == 'r' ||
+               toChar == 't') {
+      numberOfCardsToTake = 1;
     }
     movingCard = cardStack.peekOpenCards(numberOfCardsToTake);
   }
@@ -151,8 +155,12 @@ Game::userErrors Game::move(const std::string_view from,
   } else if (from.at(0) >= '1' && from.at(0) <= '7') {
     CardStack &cardStack{m_cardStack.at(from.at(0) - '1')};
     unsigned long numberOfCardsToTake{cardStack.noOfOpenCards()};
+    char toChar{to.at(0)};
     if (from.size() >= 3) {
       numberOfCardsToTake = std::stoi(static_cast<std::string>(from.substr(2)));
+    } else if (toChar == 'w' || toChar == 'e' || toChar == 'r' ||
+               toChar == 't') {
+      numberOfCardsToTake = 1;
     }
     movingCard = cardStack.takeOpenCards(numberOfCardsToTake);
   } else {

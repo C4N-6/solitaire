@@ -20,6 +20,8 @@ int main(int argc, char *argv[]) {
       std::cout << command << ": " << errorToString(commandError) << std::endl;
     }
   }
+  clearPreviousLines(2);
+  std::cout << "You win!!" << std::endl;
 endGame:
   return 0;
 }
