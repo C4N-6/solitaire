@@ -1,6 +1,7 @@
-cmake_minimum_required(VERSION 4.1.0)
+cmake_minimum_required(VERSION 4.1.2)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-project(solitaire LANGUAGES CXX VERSION 1.0.1)
+project(solitaire LANGUAGES CXX VERSION 1.0.2)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -13,12 +14,13 @@ set(PROJECT_SOURCES
   src/cardStack.cpp
 )
 
+add_definitions(-DPROJECT_VERSION="${PROJECT_VERSION}")
+
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 
-install(
-  TARGETS ${PROJECT_NAME}
-  DESTINATION bin
-)
+
+install(TARGETS ${PROJECT_NAME} DESTINATION bin)
+
 add_custom_target(
   run
   COMMAND ${PROJECT_NAME}

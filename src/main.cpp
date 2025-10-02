@@ -1,8 +1,25 @@
 #include "game.h"
+#include <argparse/argparse.hpp>
 #include <iostream>
 #include <string>
 
 int main(int argc, char *argv[]) {
+
+  argparse::ArgumentParser arg{};
+
+  arg.add_argument("-v").flag();
+
+  try {
+    arg.parse_args(argc, argv); // Example: ./main -abc 1.95 2.47
+  } catch (const std::exception &err) {
+    std::cerr << err.what() << std::endl;
+    std::cerr << arg;
+    return 1;
+  }
+  if (arg.get<bool>("-v")) {
+    std::cout << "Version: " << PROJECT_VERSION << std::endl;
+    return 0;
+  }
   Game game{};
   std::cout << game << std::endl;
   while (!game.isGameOver()) {
