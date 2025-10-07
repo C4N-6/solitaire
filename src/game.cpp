@@ -17,14 +17,6 @@
 
 #define NUMBER_OF_LINES_PRINTED_TO_DISPLAY_GAME 3 + longestCardStackLen()
 
-Game::Game() {
-  for (int i{0}; i < 7; i++) {
-    for (int j{i}; j < 7; j++) {
-      m_cardStack.at(j).addClosedCard(m_deck.drawAndTake().value());
-    }
-  }
-  refresh();
-}
 size_t Game::longestCardStackLen() const {
   size_t max{std::numeric_limits<size_t>::min()};
   for (const CardStack &cardStack : m_cardStack) {

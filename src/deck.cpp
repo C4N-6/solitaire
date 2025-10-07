@@ -8,26 +8,10 @@
 #include <optional>
 #include <random>
 
-Deck::Deck() {
-  for (int i{static_cast<int>(Card::Suit::club)};
-       i <= static_cast<int>(Card::Suit::diamond); i++) {
-    Card::Suit suit{static_cast<Card::Suit>(i)};
-    for (int j{static_cast<int>(Card::Face::ace)};
-         j <= static_cast<int>(Card::Face::king); j++) {
-      Card::Face face{static_cast<Card::Face>(j)};
-      m_deck.push_back(Card{suit, face});
-    }
-  }
-
-  shuffle();
-
-  assert(m_deck.size() == 52 && "Is the deck a full deck");
-}
-
 void Deck::shuffle() {
-  std::mt19937 s_generator(std::random_device{}());
+  std::mt19937 s_generator{std::random_device{}()};
 
-  std::shuffle(m_deck.begin(), m_deck.end(), s_generator);
+  std::shuffle(m_deck.begin(), m_deck.end(), m_generator);
 }
 
 std::optional<Card> Deck::peek() const {

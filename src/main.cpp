@@ -1,13 +1,15 @@
 #include "game.h"
 #include <argparse/argparse.hpp>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 int main(int argc, char *argv[]) {
 
   argparse::ArgumentParser arg{};
 
-  arg.add_argument("-v").flag();
+  arg.add_argument("-v").help("Shows version").flag();
+  arg.add_argument("-s", "--seed").help("add a default seed").default_value("");
 
   try {
     arg.parse_args(argc, argv); // Example: ./main -abc 1.95 2.47
@@ -20,8 +22,15 @@ int main(int argc, char *argv[]) {
     std::cout << "Version: " << PROJECT_VERSION << std::endl;
     return 0;
   }
-  Game game{};
-  std::cout << "\033[H\033[2J" << game << std::endl;
+  Game game;
+  if (arg.get("-s").empty()) {
+    game = Game{};
+  } else {
+    unsigned long seed{};
+    std::stringstream{arg.get("-s")} >> seed;
+    game = Game{seed};
+  }
+  std::cout << game << std::endl;
   while (!game.isGameOver()) {
     std::string command{};
     std::cin.sync();
