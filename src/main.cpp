@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
     return 0;
   }
   Game game{};
-  std::cout << game << std::endl;
+  std::cout << "\033[H\033[2J" << game << std::endl;
   while (!game.isGameOver()) {
     std::string command{};
     std::cin.sync();
