@@ -285,7 +285,7 @@ std::ostream &operator<<(std::ostream &cout, const Time &time) {
 }
 
 std::ostream &operator<<(std::ostream &cout, const Stats &s) {
-  cout << "The game took " << Time(s.endTime - s.startTime)
+  cout << "The game(" << s.seed << ") took " << Time(s.endTime - s.startTime)
        << ", and was completed in " << s.moveCount << " moves";
   return cout;
 }

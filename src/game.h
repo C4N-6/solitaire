@@ -29,6 +29,7 @@ struct Time {
 std::ostream &operator<<(std::ostream &cout, const Time &time);
 
 struct Stats {
+  seed_t seed{};
   std::time_t startTime{};
   std::time_t endTime{};
   int moveCount{0};
@@ -40,7 +41,7 @@ class Game {
   Deck m_deck{};
   std::array<SuitPile, 4> m_suitPiles{};
   std::array<CardStack, 7> m_cardStack{};
-  Stats m_stats{std::time(nullptr)};
+  Stats m_stats{.startTime = std::time(nullptr)};
 
 public:
   enum class userErrors {
@@ -59,13 +60,14 @@ public:
       refresh();
     }
   }
-  explicit Game(unsigned long seed) : m_deck{seed} {
+  explicit Game(seed_t seed) : m_deck{seed} {
     for (int i{0}; i < 7; i++) {
       for (int j{i}; j < 7; j++) {
         m_cardStack.at(j).addClosedCard(m_deck.drawAndTake().value());
       }
       refresh();
     }
+    m_stats.seed = seed;
   }
   void refresh();
   size_t longestCardStackLen() const;

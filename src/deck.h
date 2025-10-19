@@ -9,6 +9,8 @@
 #include <random>
 #include <vector>
 
+using seed_t = unsigned long;
+
 class Deck {
 private:
   std::vector<Card> m_deck{};
@@ -31,7 +33,7 @@ public:
 
     assert(m_deck.size() == 52 && "Is the deck a full deck");
   }
-  Deck(unsigned long seed) {
+  Deck(seed_t seed) {
     m_generator.seed(seed);
     for (int i{static_cast<int>(Card::Suit::club)};
          i <= static_cast<int>(Card::Suit::diamond); i++) {
