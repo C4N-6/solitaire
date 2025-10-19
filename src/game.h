@@ -10,6 +10,24 @@
 #include <ostream>
 #include <string_view>
 
+struct Time {
+  std::time_t m_miliseconds{};
+  std::time_t m_second{};
+  std::time_t m_minute{};
+  std::time_t m_hours{};
+
+  Time(std::time_t time) {
+    m_hours = time % (60 * 60 * 1000);
+    time /= (60 * 60 * 1000);
+    m_minute = time % (60 * 1000);
+    time /= (60 * 1000);
+    m_second = time % (1000);
+    time /= (1000);
+    m_miliseconds = time;
+  }
+};
+std::ostream &operator<<(std::ostream &cout, const Time &time);
+
 struct Stats {
   std::time_t startTime{};
   std::time_t endTime{};

@@ -270,9 +270,23 @@ void Game::refresh() {
   }
 }
 
+std::ostream &operator<<(std::ostream &cout, const Time &time) {
+  if (time.m_hours != 0) {
+    cout << time.m_hours << "h ";
+  }
+  if (time.m_minute != 0) {
+    cout << time.m_minute << "m ";
+  }
+  if (time.m_second != 0) {
+    cout << time.m_second << "s ";
+  }
+  cout << time.m_miliseconds << "ms";
+  return cout;
+}
+
 std::ostream &operator<<(std::ostream &cout, const Stats &s) {
-  cout << "The game took " << s.endTime - s.startTime
-       << "ms, and was completed in " << s.moveCount << " moves";
+  cout << "The game took " << Time(s.endTime - s.startTime)
+       << ", and was completed in " << s.moveCount << " moves";
   return cout;
 }
 
