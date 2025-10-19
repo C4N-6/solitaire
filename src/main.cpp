@@ -1,6 +1,7 @@
 #include "game.h"
 #include <argparse/argparse.hpp>
 #include <iostream>
+#include <ostream>
 #include <sstream>
 #include <string>
 
@@ -22,7 +23,9 @@ int main(int argc, char *argv[]) {
     std::cout << "Version: " << PROJECT_VERSION << std::endl;
     return 0;
   }
+
   Game game;
+
   if (arg.get("-s").empty()) {
     game = Game{};
   } else {
@@ -30,6 +33,7 @@ int main(int argc, char *argv[]) {
     std::stringstream{arg.get("-s")} >> seed;
     game = Game{seed};
   }
+
   std::cout << game << std::endl;
   while (!game.isGameOver()) {
     std::string command{};
@@ -48,6 +52,7 @@ int main(int argc, char *argv[]) {
   }
   clearPreviousLines(2);
   std::cout << "You win!!" << std::endl;
+  std::cout << game.getStats() << std::endl;
 endGame:
   return 0;
 }

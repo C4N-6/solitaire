@@ -160,6 +160,7 @@ Game::userErrors Game::move(const std::string_view from,
   }
 
   refresh();
+  m_stats.moveCount++;
   return userErrors::no_error;
 }
 
@@ -236,12 +237,13 @@ Game::userErrors Game::command(const std::string_view command) {
   }
 }
 
-bool Game::isGameOver() const {
+bool Game::isGameOver() {
   for (const SuitPile &suitPile : m_suitPiles) {
     if (!suitPile.filedUp()) {
       return false;
     }
   }
+  std::time(&m_stats.endTime);
   return true;
 }
 
@@ -266,6 +268,12 @@ void Game::refresh() {
   for (CardStack &stack : m_cardStack) {
     stack.refresh();
   }
+}
+
+std::ostream &operator<<(std::ostream &cout, const Stats &s) {
+  cout << "The game took " << s.endTime - s.startTime
+       << "ms, and was completed in " << s.moveCount << " moves";
+  return cout;
 }
 
 std::ostream &operator<<(std::ostream &cout, const Game &game) {

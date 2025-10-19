@@ -5,14 +5,24 @@
 #include "suitPile.h"
 
 #include <array>
+#include <ctime>
 #include <iostream>
 #include <ostream>
 #include <string_view>
+
+struct Stats {
+  std::time_t startTime{};
+  std::time_t endTime{};
+  int moveCount{0};
+};
+
+std::ostream &operator<<(std::ostream &cout, const Stats &s);
 
 class Game {
   Deck m_deck{};
   std::array<SuitPile, 4> m_suitPiles{};
   std::array<CardStack, 7> m_cardStack{};
+  Stats m_stats{std::time(nullptr)};
 
 public:
   enum class userErrors {
@@ -44,7 +54,8 @@ public:
   userErrors move(const std::string_view from, const std::string_view to);
   void draw() { m_deck.draw(); }
   userErrors command(const std::string_view command);
-  bool isGameOver() const;
+  bool isGameOver();
+  Stats getStats() const { return m_stats; }
   friend std::ostream &operator<<(std::ostream &cout, const Game &game);
 };
 
