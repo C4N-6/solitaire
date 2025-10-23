@@ -8,27 +8,25 @@
 #include <ctime>
 #include <iostream>
 #include <ostream>
+#include <random>
 #include <string_view>
 
 struct Time {
-  std::time_t m_miliseconds{};
   std::time_t m_second{};
   std::time_t m_minute{};
   std::time_t m_hours{};
 
-  Time(std::time_t time) {
-    m_hours = time % (60 * 60 * 1000);
-    time /= (60 * 60 * 1000);
-    m_minute = time % (60 * 1000);
-    time /= (60 * 1000);
-    m_second = time % (1000);
-    time /= (1000);
-    m_miliseconds = time;
+  Time(std::time_t seconds) {
+    m_hours = seconds / (60 * 60);
+    seconds %= (60 * 60);
+    m_minute = seconds / 60;
+    m_second = seconds % 60;
   }
 };
 std::ostream &operator<<(std::ostream &cout, const Time &time);
 
 struct Stats {
+  // TODO: start tracking the version of the game
   seed_t seed{};
   std::time_t startTime{};
   std::time_t endTime{};
@@ -38,7 +36,7 @@ struct Stats {
 std::ostream &operator<<(std::ostream &cout, const Stats &s);
 
 class Game {
-  Deck m_deck{};
+  Deck m_deck{std::random_device{}()};
   std::array<SuitPile, 4> m_suitPiles{};
   std::array<CardStack, 7> m_cardStack{};
   Stats m_stats{.startTime = std::time(nullptr)};
@@ -52,14 +50,7 @@ public:
     register_not_found,
     invalid_move,
   };
-  Game() {
-    for (int i{0}; i < 7; i++) {
-      for (int j{i}; j < 7; j++) {
-        m_cardStack.at(j).addClosedCard(m_deck.drawAndTake().value());
-      }
-      refresh();
-    }
-  }
+  Game() : Game(std::random_device{}()) {}
   explicit Game(seed_t seed) : m_deck{seed} {
     for (int i{0}; i < 7; i++) {
       for (int j{i}; j < 7; j++) {

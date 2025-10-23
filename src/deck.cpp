@@ -45,6 +45,8 @@ std::ostream &operator<<(std::ostream &cout, const Deck &deck) {
   if (deck.m_deck.empty()) {
     cout << "   ";
   } else {
+    // TODO: std::ostream &operator<<(std::ostream &cout, const Deck &deck) make
+    // it so that it shows total cards (Example 7/39)
     cout << "\033[7m" << std::setw(2) << deck.m_deck.size()
          << "\033[27m "; // █ full block
   }

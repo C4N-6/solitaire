@@ -13,13 +13,16 @@ int main(int argc, char *argv[]) {
   arg.add_argument("-s", "--seed").help("add a default seed").default_value("");
 
   try {
-    arg.parse_args(argc, argv); // Example: ./main -abc 1.95 2.47
+    arg.parse_args(argc, argv);
   } catch (const std::exception &err) {
     std::cerr << err.what() << std::endl;
     std::cerr << arg;
     return 1;
   }
   if (arg.get<bool>("-v")) {
+#ifdef DEBUG
+    std::cout << "DEBUG: ";
+#endif
     std::cout << "Version: " << PROJECT_VERSION << std::endl;
     return 0;
   }
@@ -56,3 +59,5 @@ int main(int argc, char *argv[]) {
 endGame:
   return 0;
 }
+// TODO: move Game::command(const std::string_view command) to main to have a
+// more organized program

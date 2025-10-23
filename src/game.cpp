@@ -51,6 +51,8 @@ Game::userErrors Game::move(const std::string_view from,
   }
 
   // find the cards that we can move
+
+  // TODO: add an option to switch the place of 2 SuitPiles
   std::vector<Card> movingCard{};
   if (from.at(0) == 'd') {
     std::optional<Card> tempCard{m_deck.peek()};
@@ -277,10 +279,7 @@ std::ostream &operator<<(std::ostream &cout, const Time &time) {
   if (time.m_minute != 0) {
     cout << time.m_minute << "m ";
   }
-  if (time.m_second != 0) {
-    cout << time.m_second << "s ";
-  }
-  cout << time.m_miliseconds << "ms";
+  cout << time.m_second << "s";
   return cout;
 }
 
