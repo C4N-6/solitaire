@@ -26,7 +26,7 @@ struct Time {
 std::ostream &operator<<(std::ostream &cout, const Time &time);
 
 struct Stats {
-  // TODO: start tracking the version of the game
+  std::string version{PROJECT_VERSION};
   seed_t seed{};
   std::time_t startTime{};
   std::time_t endTime{};
@@ -64,7 +64,6 @@ public:
   size_t longestCardStackLen() const;
   userErrors move(const std::string_view from, const std::string_view to);
   void draw() { m_deck.draw(); }
-  userErrors command(const std::string_view command);
   bool isGameOver();
   Stats getStats() const { return m_stats; }
   friend std::ostream &operator<<(std::ostream &cout, const Game &game);

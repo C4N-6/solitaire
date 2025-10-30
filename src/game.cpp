@@ -15,8 +15,6 @@
 #include <string_view>
 #include <vector>
 
-#define NUMBER_OF_LINES_PRINTED_TO_DISPLAY_GAME 3 + longestCardStackLen()
-
 size_t Game::longestCardStackLen() const {
   size_t max{std::numeric_limits<size_t>::min()};
   for (const CardStack &cardStack : m_cardStack) {
@@ -164,79 +162,6 @@ Game::userErrors Game::move(const std::string_view from,
   refresh();
   m_stats.moveCount++;
   return userErrors::no_error;
-}
-
-Game::userErrors Game::command(const std::string_view command) {
-  static int s_extraLines{0};
-  if (command.size() == 0) {
-    s_extraLines++;
-    return Game::userErrors::blank_command;
-  }
-  switch (command.at(0)) {
-  case 'm': {
-    const int gameLineSize{
-        static_cast<int>(NUMBER_OF_LINES_PRINTED_TO_DISPLAY_GAME)};
-    size_t start{1};
-
-    while (start < command.size() && std::isspace(command[start])) {
-      ++start;
-    }
-
-    size_t from_start{start};
-    while (start < command.size() && !std::isspace(command[start])) {
-      ++start;
-    }
-    if (from_start == start) {
-      s_extraLines++;
-      return Game::userErrors::command_formating;
-    }
-    std::string_view from = command.substr(from_start, start - from_start);
-
-    while (start < command.size() && std::isspace(command[start])) {
-      ++start;
-    }
-
-    size_t to_start{start};
-    while (start < command.size() && !std::isspace(command[start])) {
-      ++start;
-    }
-    if (to_start == start) {
-      s_extraLines++;
-      return Game::userErrors::command_formating;
-    }
-    std::string_view to = command.substr(to_start, start - to_start);
-    Game::userErrors error{move(from, to)};
-    if (error == userErrors::no_error) {
-      clearPreviousLines(gameLineSize + 2 * s_extraLines);
-      s_extraLines = 0;
-      std::cout << *this << std::endl;
-    } else {
-      s_extraLines++;
-    }
-    return error;
-  }
-  case 'd': // draw
-  {
-    draw();
-    clearPreviousLines(NUMBER_OF_LINES_PRINTED_TO_DISPLAY_GAME +
-                       2 * s_extraLines);
-    s_extraLines = 0;
-    std::cout << *this << std::endl;
-    return {};
-  }
-  case 'c': // clear
-  {
-    clearPreviousLines(NUMBER_OF_LINES_PRINTED_TO_DISPLAY_GAME +
-                       2 * s_extraLines);
-    s_extraLines = 0;
-    std::cout << *this << std::endl;
-    return {};
-  }
-  default: {
-    s_extraLines++;
-    return Game::userErrors::command_not_found;
-  }
-  }
 }
 
 bool Game::isGameOver() {
