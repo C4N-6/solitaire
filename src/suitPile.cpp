@@ -33,3 +33,11 @@ bool SuitPile::add(Card card) {
   m_currntCard++;
   return true;
 }
+
+void from_json(const nlohmann::json &j, SuitPile &s) {
+  j.at("suit").get_to(s.m_suit);
+  j.at("currentCard").get_to(s.m_currntCard);
+}
+void to_json(nlohmann::json &json, const SuitPile &suitPile) {
+  json = {{"suit", suitPile.m_suit}, {"currentCard", suitPile.m_currntCard}};
+}

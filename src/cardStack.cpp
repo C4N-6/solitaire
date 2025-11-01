@@ -73,3 +73,12 @@ std::vector<Card> CardStack::takeOpenCards(size_t noOfOpenCards) {
   }
   return removedCards;
 }
+
+void from_json(const nlohmann::json &j, CardStack &c) {
+  j.at("openCards").get_to(c.m_openCards);
+  j.at("closedCard").get_to(c.m_closedCards);
+}
+void to_json(nlohmann::json &json, const CardStack &cardStack) {
+  json = {{"openCards", cardStack.m_openCards},
+          {"closedCard", cardStack.m_closedCards}};
+}

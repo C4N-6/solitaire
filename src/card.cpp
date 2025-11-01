@@ -79,3 +79,11 @@ std::string operator+(const Card::Face face) {
     return "K ";
   }
 }
+
+void from_json(const nlohmann::json &j, Card &c) {
+  j.at("suit").get_to(c.m_suit);
+  j.at("face").get_to(c.m_face);
+}
+void to_json(nlohmann::json &j, const Card &c) {
+  j = {{"suit", c.m_suit}, {"face", c.m_face}};
+}

@@ -2,7 +2,9 @@
 #define CAN_CARD_STACK_H
 
 #include "card.h"
+
 #include <cstddef>
+#include <nlohmann/json.hpp>
 #include <optional>
 #include <vector>
 
@@ -20,8 +22,12 @@ public:
   std::vector<Card> takeOpenCards(size_t noOfOpenCards);
   size_t size() const { return m_closedCards.size() + m_openCards.size(); }
   size_t noOfOpenCards() const { return m_openCards.size(); }
+  size_t noOfClosedCards() const { return m_closedCards.size(); }
   std::optional<Card> at(size_t index) const;
   std::optional<Card> top() const { return at(size() - 1).value(); }
+
+  friend void to_json(nlohmann::json &json, const CardStack &cardStack);
+  friend void from_json(const nlohmann::json &j, CardStack &c);
 };
 
 #endif // !CAN_CARD_STACK_H

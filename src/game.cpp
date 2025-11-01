@@ -7,9 +7,11 @@
 #include <cassert>
 #include <cctype>
 #include <cstddef>
+#include <iomanip>
 #include <iostream>
 #include <iterator>
 #include <limits>
+#include <nlohmann/json.hpp>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -41,6 +43,31 @@ bool charIsAReg(const char c) {
     return false;
   }
 }
+bool charIsASuitPile(const char c) {
+  switch (c) {
+  case 'w':
+  case 'e':
+  case 'r':
+  case 't':
+    return true;
+  default:
+    return false;
+  }
+}
+SuitPile &Game::getSuitPileFromChar(const char c) {
+  switch (c) {
+  case 'w':
+    return m_suitPiles.at(0);
+  case 'e':
+    return m_suitPiles.at(1);
+  case 'r':
+    return m_suitPiles.at(2);
+  case 't':
+    return m_suitPiles.at(3);
+  }
+  assert(true && "impossible suitPiles to check for");
+  return m_suitPiles.at(0);
+}
 
 Game::userErrors Game::move(const std::string_view from,
                             const std::string_view to) {
@@ -48,146 +75,181 @@ Game::userErrors Game::move(const std::string_view from,
     return userErrors::register_not_found;
   }
 
-  // find the cards that we can move
+  if (charIsASuitPile(from.at(0)) &&
+      charIsASuitPile(to.at(0))) { // switch 2 suitPiles
+    SuitPile &fromPile = getSuitPileFromChar(from.at(0));
+    SuitPile &toPile = getSuitPileFromChar(to.at(0));
 
-  // TODO: add an option to switch the place of 2 SuitPiles
-  std::vector<Card> movingCard{};
-  if (from.at(0) == 'd') {
-    std::optional<Card> tempCard{m_deck.peek()};
-    if (tempCard.has_value()) {
-      movingCard.push_back(tempCard.value());
-    } else {
-      return userErrors::invalid_move;
-    }
-  } else if (from.at(0) == 'w') {
-    std::optional<Card> tempCard{m_suitPiles.at(0).peek()};
-    if (tempCard.has_value()) {
-      movingCard.push_back(tempCard.value());
-    } else {
-      return userErrors::invalid_move;
-    }
-  } else if (from.at(0) == 'e') {
-    std::optional<Card> tempCard{m_suitPiles.at(1).peek()};
-    if (tempCard.has_value()) {
-      movingCard.push_back(tempCard.value());
-    } else {
-      return userErrors::invalid_move;
-    }
-  } else if (from.at(0) == 'r') {
-    std::optional<Card> tempCard{m_suitPiles.at(2).peek()};
-    if (tempCard.has_value()) {
-      movingCard.push_back(tempCard.value());
-    } else {
-      return userErrors::invalid_move;
-    }
-  } else if (from.at(0) == 't') {
-    std::optional<Card> tempCard{m_suitPiles.at(3).peek()};
-    if (tempCard.has_value()) {
-      movingCard.push_back(tempCard.value());
-    } else {
-      return userErrors::invalid_move;
-    }
-  } else if (from.at(0) >= '1' && from.at(0) <= '7') {
-    CardStack &cardStack{m_cardStack.at(from.at(0) - '1')};
-    unsigned long numberOfCardsToTake{cardStack.noOfOpenCards()};
-    char toChar{to.at(0)};
-    if (from.size() >= 3) {
-      numberOfCardsToTake = std::stoi(static_cast<std::string>(from.substr(2)));
-    } else if (toChar == 'w' || toChar == 'e' || toChar == 'r' ||
-               toChar == 't') {
-      numberOfCardsToTake = 1;
-    }
-    movingCard = cardStack.peekOpenCards(numberOfCardsToTake);
-  }
-
-  // find if we can move those cards
-  if (movingCard.empty()) {
-    return userErrors::invalid_move;
-  } else if (to.at(0) >= '1' && to.at(0) <= '7') {
-    CardStack &cardStack{m_cardStack.at(to.at(0) - '1')};
-    if (!cardStack.canAddOpenCard(movingCard.at(0))) {
-      return userErrors::invalid_move;
-    }
-    cardStack.addOpenCards(movingCard);
-  } else if (movingCard.size() != 1) {
-    return userErrors::invalid_move;
-  } else if (to.at(0) == 'w') {
-    if (!m_suitPiles.at(0).canAdd(movingCard.at(0))) {
-      return userErrors::invalid_move;
-    }
-    m_suitPiles.at(0).add(movingCard.at(0));
-  } else if (to.at(0) == 'e') {
-    if (!m_suitPiles.at(1).canAdd(movingCard.at(0))) {
-      return userErrors::invalid_move;
-    }
-    m_suitPiles.at(1).add(movingCard.at(0));
-  } else if (to.at(0) == 'r') {
-    if (!m_suitPiles.at(2).canAdd(movingCard.at(0))) {
-      return userErrors::invalid_move;
-    }
-    m_suitPiles.at(2).add(movingCard.at(0));
-  } else if (to.at(0) == 't') {
-    if (!m_suitPiles.at(3).canAdd(movingCard.at(0))) {
-      return userErrors::invalid_move;
-    }
-    m_suitPiles.at(3).add(movingCard.at(0));
-  }
-
-  // remove the cards
-  if (from.at(0) == 'd') {
-    m_deck.take();
-  } else if (from.at(0) == 'w') {
-    m_suitPiles.at(0).pop();
-  } else if (from.at(0) == 'e') {
-    m_suitPiles.at(1).pop();
-  } else if (from.at(0) == 'r') {
-    m_suitPiles.at(2).pop();
-  } else if (from.at(0) == 't') {
-    m_suitPiles.at(3).pop();
-  } else if (from.at(0) >= '1' && from.at(0) <= '7') {
-    CardStack &cardStack{m_cardStack.at(from.at(0) - '1')};
-    unsigned long numberOfCardsToTake{cardStack.noOfOpenCards()};
-    char toChar{to.at(0)};
-    if (from.size() >= 3) {
-      numberOfCardsToTake = std::stoi(static_cast<std::string>(from.substr(2)));
-    } else if (toChar == 'w' || toChar == 'e' || toChar == 'r' ||
-               toChar == 't') {
-      numberOfCardsToTake = 1;
-    }
-    movingCard = cardStack.takeOpenCards(numberOfCardsToTake);
+    SuitPile temp{fromPile};
+    fromPile = toPile;
+    toPile = temp;
   } else {
-    return userErrors::register_not_found;
+    // find the cards that we can move
+
+    std::vector<Card> movingCard{};
+    if (from.at(0) == 'd') {
+      std::optional<Card> tempCard{m_deck.peek()};
+      if (tempCard.has_value()) {
+        movingCard.push_back(tempCard.value());
+      } else {
+        return userErrors::invalid_move;
+      }
+    } else if (from.at(0) == 'w') {
+      std::optional<Card> tempCard{m_suitPiles.at(0).peek()};
+      if (tempCard.has_value()) {
+        movingCard.push_back(tempCard.value());
+      } else {
+        return userErrors::invalid_move;
+      }
+    } else if (from.at(0) == 'e') {
+      std::optional<Card> tempCard{m_suitPiles.at(1).peek()};
+      if (tempCard.has_value()) {
+        movingCard.push_back(tempCard.value());
+      } else {
+        return userErrors::invalid_move;
+      }
+    } else if (from.at(0) == 'r') {
+      std::optional<Card> tempCard{m_suitPiles.at(2).peek()};
+      if (tempCard.has_value()) {
+        movingCard.push_back(tempCard.value());
+      } else {
+        return userErrors::invalid_move;
+      }
+    } else if (from.at(0) == 't') {
+      std::optional<Card> tempCard{m_suitPiles.at(3).peek()};
+      if (tempCard.has_value()) {
+        movingCard.push_back(tempCard.value());
+      } else {
+        return userErrors::invalid_move;
+      }
+    } else if (from.at(0) >= '1' && from.at(0) <= '7') {
+      CardStack &cardStack{m_cardStack.at(from.at(0) - '1')};
+      unsigned long numberOfCardsToTake{cardStack.noOfOpenCards()};
+      char toChar{to.at(0)};
+      if (from.size() >= 3) {
+        numberOfCardsToTake =
+            std::stoi(static_cast<std::string>(from.substr(2)));
+      } else if (toChar == 'w' || toChar == 'e' || toChar == 'r' ||
+                 toChar == 't') {
+        numberOfCardsToTake = 1;
+      }
+      movingCard = cardStack.peekOpenCards(numberOfCardsToTake);
+    }
+
+    // find if we can move those cards
+    if (movingCard.empty() || to.at(0) == 'd') {
+      return userErrors::invalid_move;
+    } else if (to.at(0) >= '1' && to.at(0) <= '7') {
+      CardStack &cardStack{m_cardStack.at(to.at(0) - '1')};
+      if (!cardStack.canAddOpenCard(movingCard.at(0))) {
+        return userErrors::invalid_move;
+      }
+      cardStack.addOpenCards(movingCard);
+    } else if (movingCard.size() != 1) {
+      return userErrors::invalid_move;
+    } else if (to.at(0) == 'w') {
+      if (!m_suitPiles.at(0).canAdd(movingCard.at(0))) {
+        return userErrors::invalid_move;
+      }
+      m_suitPiles.at(0).add(movingCard.at(0));
+    } else if (to.at(0) == 'e') {
+      if (!m_suitPiles.at(1).canAdd(movingCard.at(0))) {
+        return userErrors::invalid_move;
+      }
+      m_suitPiles.at(1).add(movingCard.at(0));
+    } else if (to.at(0) == 'r') {
+      if (!m_suitPiles.at(2).canAdd(movingCard.at(0))) {
+        return userErrors::invalid_move;
+      }
+      m_suitPiles.at(2).add(movingCard.at(0));
+    } else if (to.at(0) == 't') {
+      if (!m_suitPiles.at(3).canAdd(movingCard.at(0))) {
+        return userErrors::invalid_move;
+      }
+      m_suitPiles.at(3).add(movingCard.at(0));
+    }
+
+    // remove the cards
+    if (from.at(0) == 'd') {
+      m_deck.take();
+    } else if (from.at(0) == 'w') {
+      m_suitPiles.at(0).pop();
+    } else if (from.at(0) == 'e') {
+      m_suitPiles.at(1).pop();
+    } else if (from.at(0) == 'r') {
+      m_suitPiles.at(2).pop();
+    } else if (from.at(0) == 't') {
+      m_suitPiles.at(3).pop();
+    } else if (from.at(0) >= '1' && from.at(0) <= '7') {
+      CardStack &cardStack{m_cardStack.at(from.at(0) - '1')};
+      unsigned long numberOfCardsToTake{cardStack.noOfOpenCards()};
+      char toChar{to.at(0)};
+      if (from.size() >= 3) {
+        numberOfCardsToTake =
+            std::stoi(static_cast<std::string>(from.substr(2)));
+      } else if (toChar == 'w' || toChar == 'e' || toChar == 'r' ||
+                 toChar == 't') {
+        numberOfCardsToTake = 1;
+      }
+      movingCard = cardStack.takeOpenCards(numberOfCardsToTake);
+    } else {
+      return userErrors::register_not_found;
+    }
   }
 
   refresh();
   m_stats.moveCount++;
   return userErrors::no_error;
 }
-
-bool Game::isGameOver() {
-  for (const SuitPile &suitPile : m_suitPiles) {
-    if (!suitPile.filedUp()) {
+bool Game::isGameOver() const {
+  if (m_deck.count() != 0) {
+    return false;
+  }
+  for (const CardStack &cardStack : m_cardStack) {
+    if (cardStack.noOfClosedCards() != 0) {
       return false;
     }
   }
-  std::time(&m_stats.endTime);
   return true;
 }
 
+bool Game::isCardStacksEmpty() const {
+  if (m_deck.count() != 0) {
+    return false;
+  }
+  for (const CardStack &cardStack : m_cardStack) {
+    if (cardStack.size() != 0) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool Game::isGameOver() {
+  if (static_cast<const Game *>(this)->isGameOver()) {
+    std::time(&m_stats.endTime);
+    return true;
+  }
+  return false;
+}
+
 std::string_view errorToString(const Game::userErrors error) {
+  using errors = Game::userErrors;
   switch (error) {
-  case Game::userErrors::no_error:
+  case errors::no_error:
     return "";
-  case Game::userErrors::blank_command:
+  case errors::blank_command:
     return "no command entered";
-  case Game::userErrors::command_not_found:
+  case errors::command_not_found:
     return "the command you entered dose not exits";
-  case Game::userErrors::command_formating:
+  case errors::command_formating:
     return "the command was formatted incorrectly";
-  case Game::userErrors::register_not_found:
+  case errors::register_not_found:
     return "the registers you entered dose not exist";
-  case Game::userErrors::invalid_move:
+  case errors::invalid_move:
     return "you can not make that move";
+  case errors::file_not_found:
+    return "the file you entered was not found";
   }
 }
 
@@ -209,15 +271,16 @@ std::ostream &operator<<(std::ostream &cout, const Time &time) {
 }
 
 std::ostream &operator<<(std::ostream &cout, const Stats &s) {
-  cout << "The game(" << s.seed << ") took " << Time(s.endTime - s.startTime)
-       << ", and was completed in " << s.moveCount << " moves";
+  cout << "The game(seed: " << s.seed << ") took "
+       << Time(s.endTime - s.startTime) << ", and was completed in "
+       << s.moveCount << " moves";
   return cout;
 }
 
 std::ostream &operator<<(std::ostream &cout, const Game &game) {
-  cout << game.m_deck << "     ";
+  cout << game.m_deck << std::string(4, ' ');
   for (int i{0}; i < std::size(game.m_suitPiles); i++) {
-    cout << game.m_suitPiles[i] << ' ';
+    cout << std::setw(3) << game.m_suitPiles[i] << ' ';
   }
 
   const size_t size{game.longestCardStackLen()};
@@ -229,4 +292,31 @@ std::ostream &operator<<(std::ostream &cout, const Game &game) {
     cout << std::endl;
   }
   return cout;
+}
+
+void from_json(const nlohmann::json &j, Stats &stats) {
+  j.at("seed").get_to(stats.seed);
+  j.at("startTime").get_to(stats.startTime);
+  j.at("endTime").get_to(stats.endTime);
+  j.at("version").get_to(stats.version);
+  j.at("moveCount").get_to(stats.moveCount);
+}
+void to_json(nlohmann::json &json, const Stats &stats) {
+  json = {{"seed", stats.seed},
+          {"startTime", stats.startTime},
+          {"endTime", stats.endTime},
+          {"version", stats.version},
+          {"moveCount", stats.moveCount}};
+}
+void from_json(const nlohmann::json &j, Game &game) {
+  j.at("stats").get_to(game.m_stats);
+  j.at("deck").get_to(game.m_deck);
+  j.at("cardStack").get_to(game.m_cardStack);
+  j.at("suitPiles").get_to(game.m_suitPiles);
+}
+void to_json(nlohmann::json &json, const Game &game) {
+  json = {{"stats", game.m_stats},
+          {"deck", game.m_deck},
+          {"cardStack", game.m_cardStack},
+          {"suitPiles", game.m_suitPiles}};
 }

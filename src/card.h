@@ -1,6 +1,7 @@
 #ifndef CAN_CARD_H
 #define CAN_CARD_H
 
+#include <nlohmann/json.hpp>
 #include <optional>
 #include <ostream>
 #include <string>
@@ -49,6 +50,9 @@ public:
   Suit getSuit() const { return m_suit; }
   Face getFace() const { return m_face; }
   std::string str() const;
+
+  friend void to_json(nlohmann::json &j, const Card &c);
+  friend void from_json(const nlohmann::json &j, Card &c);
 };
 
 std::string getColorEscSeq(const Card::Color &color);
@@ -59,7 +63,7 @@ inline std::ostream &operator<<(std::ostream &cout, const Card &card) {
 inline std::ostream &operator<<(std::ostream &cout,
                                 const std::optional<Card> &card) {
   if (card) {
-    return cout << card->str();
+    return cout << card.value();
   }
   return cout << "   ";
 }

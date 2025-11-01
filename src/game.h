@@ -5,8 +5,10 @@
 #include "suitPile.h"
 
 #include <array>
+#include <cstdio>
 #include <ctime>
 #include <iostream>
+#include <nlohmann/json.hpp>
 #include <ostream>
 #include <random>
 #include <string_view>
@@ -33,6 +35,8 @@ struct Stats {
   int moveCount{0};
 };
 
+void to_json(nlohmann::json &json, const Stats &stats);
+void from_json(const nlohmann::json &j, Stats &stats);
 std::ostream &operator<<(std::ostream &cout, const Stats &s);
 
 class Game {
@@ -49,6 +53,7 @@ public:
     command_formating,
     register_not_found,
     invalid_move,
+    file_not_found,
   };
   Game() : Game(std::random_device{}()) {}
   explicit Game(seed_t seed) : m_deck{seed} {
@@ -65,15 +70,16 @@ public:
   userErrors move(const std::string_view from, const std::string_view to);
   void draw() { m_deck.draw(); }
   bool isGameOver();
+  bool isGameOver() const;
+  bool isCardStacksEmpty() const;
   Stats getStats() const { return m_stats; }
   friend std::ostream &operator<<(std::ostream &cout, const Game &game);
-};
+  friend void to_json(nlohmann::json &j, const Game &game);
+  friend void from_json(const nlohmann::json &j, Game &game);
 
-inline void clearPreviousLines(int lines) {
-  for (int i = 0; i < lines; ++i) {
-    std::cout << "\033[F\033[2K"; // Move up and clear line
-  }
-}
+private:
+  SuitPile &getSuitPileFromChar(const char c);
+};
 
 std::string_view errorToString(const Game::userErrors error);
 #endif // !CAN_GAME_H

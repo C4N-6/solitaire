@@ -2,7 +2,10 @@
 #define CAN_SUIT_PILE_H
 
 #include "card.h"
+
+#include <nlohmann/json.hpp>
 #include <ostream>
+
 class SuitPile {
   Card::Suit m_suit{};
   int m_currntCard{0};
@@ -17,6 +20,9 @@ public:
   bool filedUp() const {
     return m_currntCard == static_cast<int>(Card::Face::king);
   }
+
+  friend void to_json(nlohmann::json &json, const SuitPile &suitPile);
+  friend void from_json(const nlohmann::json &j, SuitPile &s);
 };
 
 inline std::ostream &operator<<(std::ostream &cout, const SuitPile &suitPile) {

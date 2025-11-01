@@ -3,16 +3,20 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstddef>
 #include <iomanip>
 #include <iostream>
 #include <optional>
 #include <random>
+#include <string>
 
 void Deck::shuffle() {
   std::mt19937 s_generator{std::random_device{}()};
 
   std::shuffle(m_deck.begin(), m_deck.end(), m_generator);
 }
+
+size_t Deck::count() const { return m_deck.size() + m_deckPile.size(); }
 
 std::optional<Card> Deck::peek() const {
   return m_deckPile.empty() ? std::optional<Card>{} : m_deckPile.back();
@@ -43,17 +47,24 @@ std::optional<Card> Deck::drawAndTake() {
 
 std::ostream &operator<<(std::ostream &cout, const Deck &deck) {
   if (deck.m_deck.empty()) {
-    cout << "   ";
+    cout << std::string(6, ' ');
   } else {
-    // TODO: std::ostream &operator<<(std::ostream &cout, const Deck &deck) make
-    // it so that it shows total cards (Example 7/39)
-    cout << "\033[7m" << std::setw(2) << deck.m_deck.size()
+    cout << "\033[7m" << std::setw(2) << deck.m_deck.size() << '/'
+         << std::setw(2) << deck.m_deck.size() + deck.m_deckPile.size()
          << "\033[27m "; // █ full block
   }
   if (deck.m_deckPile.empty()) {
-    cout << "   ";
+    cout << std::string(3, ' ');
   } else {
     cout << deck.m_deckPile.back();
   }
   return cout;
+}
+
+void from_json(const nlohmann::json &j, Deck &d) {
+  j.at("deck").get_to(d.m_deck);
+  j.at("deckPile").get_to(d.m_deckPile);
+}
+void to_json(nlohmann::json &j, const Deck &d) {
+  j = {{"deck", d.m_deck}, {"deckPile", d.m_deckPile}};
 }

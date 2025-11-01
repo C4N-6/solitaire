@@ -4,6 +4,7 @@
 #include "card.h"
 
 #include <cassert>
+#include <nlohmann/json.hpp>
 #include <optional>
 #include <ostream>
 #include <random>
@@ -36,11 +37,14 @@ public:
   }
 
   void draw();
+  size_t count() const;
   std::optional<Card> peek() const;
   std::optional<Card> take();
   std::optional<Card> drawAndTake();
 
   void shuffle();
+  friend void to_json(nlohmann::json &j, const Deck &d);
+  friend void from_json(const nlohmann::json &j, Deck &d);
 
   friend std::ostream &operator<<(std::ostream &cout, const Deck &deck);
 };
