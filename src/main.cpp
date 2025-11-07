@@ -2,48 +2,40 @@
 #include "game.h"
 
 #include <argparse/argparse.hpp>
+#include <cctype>
 #include <chrono>
 #include <fstream>
 #include <iostream>
 #include <ostream>
-#include <sstream>
 #include <string>
 #include <thread>
 
 int main(int argc, char *argv[]) {
 
-  argparse::ArgumentParser arg{};
+  // Argument parsing
+  argparse::ArgumentParser arg("solitaire", PROJECT_VERSION);
 
-  arg.add_argument("-v").help("Shows version").flag();
-  arg.add_argument("-s", "--seed").help("add a default seed").default_value("");
-  arg.add_argument("-f", "--file")
-      .help("continue from save file")
-      .default_value("");
+  auto &gameStateGroup = arg.add_mutually_exclusive_group();
+  gameStateGroup.add_argument("-s", "--seed")
+      .help("runs program with a set seed")
+      .metavar("SEED")
+      .scan<'d', unsigned long>();
+  gameStateGroup.add_argument("-f", "--file")
+      .help("continue a previous game from save file")
+      .metavar("FILE");
 
   try {
     arg.parse_args(argc, argv);
 
-    if (!arg.get<std::string>("--seed").empty() &&
-        !arg.get<std::string>("--file").empty()) {
-      throw std::runtime_error(
-          "Error: --seed and --file cannot be used together.");
-    }
   } catch (const std::exception &err) {
     std::cerr << err.what() << std::endl;
     std::cerr << arg;
     return 1;
   }
-  if (arg.get<bool>("-v")) {
-#ifdef DEBUG
-    std::cout << "DEBUG: ";
-#endif
-    std::cout << "Version: " << PROJECT_VERSION << std::endl;
-    return 0;
-  }
 
   Game game;
 
-  if (!arg.get("--file").empty()) {
+  if (arg.is_used("--file")) {
     std::ifstream file(arg.get("--file"));
     if (!file.is_open()) {
       std::cerr << "Error: failed to open file" << std::endl;
@@ -55,13 +47,13 @@ int main(int argc, char *argv[]) {
     file >> j;
 
     game = j.get<Game>();
-  } else if (!arg.get("--seed").empty()) {
-    unsigned long seed{};
-    std::stringstream{arg.get("-s")} >> seed;
-    game = Game{seed};
+  } else if (arg.is_used("--seed")) {
+    game = Game{arg.get<unsigned long>("--seed")};
   } else {
     game = Game{};
   }
+
+  // main loop
 
   std::cout << game << std::endl;
   while (!game.isGameOver()) {
@@ -79,7 +71,6 @@ int main(int argc, char *argv[]) {
       std::cout << command << ": " << errorToString(commandError) << std::endl;
     }
   }
-  clearPreviousLines(3);
   endingAnimation(game);
   std::cout << "You win!!" << std::endl;
   std::cout << game.getStats() << std::endl;
