@@ -302,11 +302,9 @@ void from_json(const nlohmann::json &j, Stats &stats) {
   j.at("moveCount").get_to(stats.moveCount);
 }
 void to_json(nlohmann::json &json, const Stats &stats) {
-  json = {{"seed", stats.seed},
-          {"startTime", stats.startTime},
-          {"endTime", stats.endTime},
-          {"version", stats.version},
-          {"moveCount", stats.moveCount}};
+  json = {{"seed", stats.seed},           {"startTime", stats.startTime},
+          {"endTime", stats.endTime},     {"version", stats.version},
+          {"moveCount", stats.moveCount}, {"user", stats.user}};
 }
 void from_json(const nlohmann::json &j, Game &game) {
   j.at("stats").get_to(game.m_stats);

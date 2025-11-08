@@ -1,5 +1,6 @@
 #ifndef CAN_GAME_H
 #define CAN_GAME_H
+#include "UserName.h"
 #include "cardStack.h"
 #include "deck.h"
 #include "suitPile.h"
@@ -33,6 +34,10 @@ struct Stats {
   std::time_t startTime{};
   std::time_t endTime{};
   int moveCount{0};
+  /**
+   * the user who started the game
+   */
+  std::string user{getCurrentUserName()};
 };
 
 void to_json(nlohmann::json &json, const Stats &stats);

@@ -15,6 +15,7 @@ int main(int argc, char *argv[]) {
   // Argument parsing
   argparse::ArgumentParser arg("solitaire", PROJECT_VERSION);
 
+  // TODO: add a leader board
   auto &gameStateGroup = arg.add_mutually_exclusive_group();
   gameStateGroup.add_argument("-s", "--seed")
       .help("runs program with a set seed")

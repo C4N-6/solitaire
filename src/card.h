@@ -65,7 +65,7 @@ inline std::ostream &operator<<(std::ostream &cout,
   if (card) {
     return cout << card.value();
   }
-  return cout << "   ";
+  return cout << std::string(3, ' ');
 }
 std::string operator+(const Card::Suit suit);
 std::string operator+(const Card::Face face);
