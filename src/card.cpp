@@ -30,6 +30,9 @@ inline std::string getColorEscSeq(const Card::Color &color) {
 }
 
 std::string Card::str() const {
+  if (m_face == Face::none && m_suit == Suit::none) {
+    return "\033[7m   \033[27m";
+  }
   return getColorEscSeq(getColor()) + (+m_suit) + (+m_face) + RESET_FORMATING;
 }
 

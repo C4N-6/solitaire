@@ -165,7 +165,7 @@ Game::userErrors game_command(Game &game, const std::string_view command) {
       return Game::userErrors::file_not_found;
     }
 
-    file << j.dump(2);
+    file << j.dump();
 
     clearPreviousLines(3 + game.longestCardStackLen() + 2 * s_extraLines);
     s_extraLines = 0;
