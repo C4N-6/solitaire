@@ -10,10 +10,31 @@
 #include <string>
 #include <thread>
 
+const std::string PROGRAM_DESCRIPTION{
+    "A program to play solitaire\n\n"
+    "Commands:\n"
+    "  d: draws a card\n"
+    "  m [FromRegister] [ToRegister]: move a "
+    "card from FromRegister to ToRegister\n\n"
+    "    Registers:\n"
+    "      1-7: these are all of the Tableau in order\n"
+    "      w: the first Foundation\n"
+    "      e: the second Foundation\n"
+    "      r: the third Foundation\n"
+    "      t: the fourth Foundation\n"
+    "      d: the Waste Pile\n\n"
+    "  c: redraws the game\n"
+    "  s [FileName]: saves the current game to the file FileName\n"
+    "  l [FileName]: loads the current game from the file FileName\n"
+    "  h: prints the list of commands\n"
+    "  q: quit the game\n"};
+
+argparse::ArgumentParser arg("solitaire", PROJECT_VERSION);
+
 int main(int argc, char *argv[]) {
 
   // Argument parsing
-  argparse::ArgumentParser arg("solitaire", PROJECT_VERSION);
+  arg.add_description(PROGRAM_DESCRIPTION);
 
   // TODO: add a leader board
   auto &gameStateGroup = arg.add_mutually_exclusive_group();
@@ -82,10 +103,15 @@ endGame:
 Game::userErrors game_command(Game &game, const std::string_view command) {
   static int s_extraLines{0};
   if (command.size() == 0) {
-    s_extraLines++;
+    s_extraLines += 2;
     return Game::userErrors::blank_command;
   }
   switch (command.at(0)) {
+  case 'h': {
+    s_extraLines += 20;
+    std::cout << PROGRAM_DESCRIPTION;
+    return {};
+  }
   case 'm': {
     const int gameLineSize{static_cast<int>(3 + game.longestCardStackLen())};
     size_t start{1};
@@ -99,7 +125,7 @@ Game::userErrors game_command(Game &game, const std::string_view command) {
       ++start;
     }
     if (from_start == start) {
-      s_extraLines++;
+      s_extraLines += 2;
       return Game::userErrors::command_formating;
     }
     std::string_view from = command.substr(from_start, start - from_start);
@@ -113,31 +139,31 @@ Game::userErrors game_command(Game &game, const std::string_view command) {
       ++start;
     }
     if (to_start == start) {
-      s_extraLines++;
+      s_extraLines += 2;
       return Game::userErrors::command_formating;
     }
     std::string_view to = command.substr(to_start, start - to_start);
     Game::userErrors error{game.move(from, to)};
     if (error == Game::userErrors::no_error) {
-      clearPreviousLines(gameLineSize + 2 * s_extraLines);
+      clearPreviousLines(gameLineSize + s_extraLines);
       s_extraLines = 0;
       std::cout << game << std::endl;
     } else {
-      s_extraLines++;
+      s_extraLines += 2;
     }
     return error;
   }
   case 'd': // draw
   {
     game.draw();
-    clearPreviousLines(3 + game.longestCardStackLen() + 2 * s_extraLines);
+    clearPreviousLines(3 + game.longestCardStackLen() + s_extraLines);
     s_extraLines = 0;
     std::cout << game << std::endl;
     return {};
   }
   case 'c': // clear
   {
-    clearPreviousLines(3 + game.longestCardStackLen() + 2 * s_extraLines);
+    clearPreviousLines(3 + game.longestCardStackLen() + s_extraLines);
     s_extraLines = 0;
     std::cout << game << std::endl;
     return {};
@@ -155,20 +181,20 @@ Game::userErrors game_command(Game &game, const std::string_view command) {
       ++start;
     }
     if (from_start == start) {
-      s_extraLines++;
+      s_extraLines += 2;
       return Game::userErrors::command_formating;
     }
     std::string fileName{command.substr(from_start, start - from_start)};
 
     std::ofstream file(fileName);
     if (!file.is_open()) {
-      s_extraLines++;
+      s_extraLines += 2;
       return Game::userErrors::file_not_found;
     }
 
     file << j.dump();
 
-    clearPreviousLines(3 + game.longestCardStackLen() + 2 * s_extraLines);
+    clearPreviousLines(3 + game.longestCardStackLen() + s_extraLines);
     s_extraLines = 0;
     std::cout << game << std::endl;
     return {};
@@ -185,14 +211,14 @@ Game::userErrors game_command(Game &game, const std::string_view command) {
       ++start;
     }
     if (from_start == start) {
-      s_extraLines++;
+      s_extraLines += 2;
       return Game::userErrors::command_formating;
     }
     std::string fileName{command.substr(from_start, start - from_start)};
 
     std::ifstream file(fileName);
     if (!file.is_open()) {
-      s_extraLines++;
+      s_extraLines += 2;
       return Game::userErrors::file_not_found;
     }
 
@@ -200,13 +226,13 @@ Game::userErrors game_command(Game &game, const std::string_view command) {
     file >> j;
     game = j.get<Game>();
 
-    clearPreviousLines(3 + game.longestCardStackLen() + 2 * s_extraLines);
+    clearPreviousLines(3 + game.longestCardStackLen() + s_extraLines);
     s_extraLines = 0;
     std::cout << game << std::endl;
     return {};
   }
   default: {
-    s_extraLines++;
+    s_extraLines += 2;
     return Game::userErrors::command_not_found;
   }
   }

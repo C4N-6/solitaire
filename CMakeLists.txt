@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 4.1.2)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-project(solitaire LANGUAGES CXX VERSION 2.1.0)
+project(solitaire LANGUAGES CXX VERSION 2.2.0)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -32,6 +32,13 @@ add_custom_target(
 add_custom_target(
     version
     COMMAND ${PROJECT_NAME} -v
+    DEPENDS ${PROJECT_NAME}
+    COMMENT "getting version"
+)
+
+add_custom_target(
+    showHelp
+    COMMAND ${PROJECT_NAME} -h
     DEPENDS ${PROJECT_NAME}
     COMMENT "getting version"
 )
