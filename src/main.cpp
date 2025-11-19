@@ -1,9 +1,14 @@
 #include "main.h"
 #include "game.h"
+#include "leaderBoard.h"
+#include "stats.h"
 
 #include <argparse/argparse.hpp>
 #include <cctype>
 #include <chrono>
+#include <cstddef>
+#include <cstdlib>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <ostream>
@@ -35,8 +40,63 @@ int main(int argc, char *argv[]) {
 
   // Argument parsing
   arg.add_description(PROGRAM_DESCRIPTION);
+  arg.add_argument("--leader-board")
+      .help("set where the leader board is stored")
+      .metavar("FILE")
+      .default_value(getXdgDataHome() + "/solitaire/solitaire.json");
 
-  // TODO: add a leader board
+  argparse::ArgumentParser leaderBoardParser{"leaderBoard"};
+  leaderBoardParser.add_description("display the leader board of past games");
+
+  leaderBoardParser.add_argument("-n")
+      .help("maximum number of games to be displayed")
+      .metavar("NUMBER")
+      .default_value(10)
+      .nargs(1)
+      .scan<'d', int>();
+
+  leaderBoardParser.add_argument("-a")
+      .help("display the average moves and average time per game")
+      .default_value(false)
+      .implicit_value(true);
+
+  leaderBoardParser.add_argument("-d")
+      .help("display the day each game ended at")
+      .default_value(false)
+      .implicit_value(true);
+
+  leaderBoardParser.add_argument("-i")
+      .help("display the index of the games")
+      .default_value(false)
+      .implicit_value(true);
+
+  leaderBoardParser.add_argument("-t")
+      .help("display the time the games took to beat")
+      .default_value(false)
+      .implicit_value(true);
+
+  leaderBoardParser.add_argument("-m")
+      .help("display the number of moves the games took to beat")
+      .default_value(false)
+      .implicit_value(true);
+
+  leaderBoardParser.add_argument("-s")
+      .help("display the seed of the games")
+      .default_value(false)
+      .implicit_value(true);
+
+  leaderBoardParser.add_argument("-u")
+      .help("display the user name of the person who beat the games")
+      .default_value(false)
+      .implicit_value(true);
+
+  leaderBoardParser.add_argument("-v")
+      .help("display the version the games was beaten at")
+      .default_value(false)
+      .implicit_value(true);
+
+  arg.add_subparser(leaderBoardParser);
+
   auto &gameStateGroup = arg.add_mutually_exclusive_group();
   gameStateGroup.add_argument("-s", "--seed")
       .help("runs program with a set seed")
@@ -52,7 +112,19 @@ int main(int argc, char *argv[]) {
   } catch (const std::exception &err) {
     std::cerr << err.what() << std::endl;
     std::cerr << arg;
-    return 1;
+    return EXIT_FAILURE;
+  }
+
+  LeaderBoard leaderBoard{arg.get("--leader-board")};
+
+  if (arg.is_subcommand_used(leaderBoardParser)) {
+    std::cout << leaderBoard.toString(
+        leaderBoardParser.get<int>("-n"), leaderBoardParser.get<bool>("-a"),
+        leaderBoardParser.get<bool>("-d"), leaderBoardParser.get<bool>("-i"),
+        leaderBoardParser.get<bool>("-t"), leaderBoardParser.get<bool>("-m"),
+        leaderBoardParser.get<bool>("-s"), leaderBoardParser.get<bool>("-u"),
+        leaderBoardParser.get<bool>("-v"));
+    return EXIT_SUCCESS;
   }
 
   Game game;
@@ -61,7 +133,7 @@ int main(int argc, char *argv[]) {
     std::ifstream file(arg.get("--file"));
     if (!file.is_open()) {
       std::cerr << "Error: failed to open file" << std::endl;
-      return 1;
+      return EXIT_FAILURE;
     }
 
     nlohmann::json j;
@@ -69,6 +141,7 @@ int main(int argc, char *argv[]) {
     file >> j;
 
     game = j.get<Game>();
+    file.close();
   } else if (arg.is_used("--seed")) {
     game = Game{arg.get<unsigned long>("--seed")};
   } else {
@@ -87,17 +160,20 @@ int main(int argc, char *argv[]) {
     Game::userErrors commandError{game_command(game, command)};
     if (commandError == Game::userErrors::command_not_found &&
         command.at(0) == 'q') {
-      std::cout << "quitting game" << std::endl;
       goto endGame;
     } else if (commandError != Game::userErrors::no_error) {
       std::cout << command << ": " << errorToString(commandError) << std::endl;
     }
   }
   endingAnimation(game);
-  std::cout << "You win!!" << std::endl;
-  std::cout << game.getStats() << std::endl;
+  {
+    Stats stats{game.getStats()};
+    leaderBoard.add(stats);
+    leaderBoard.save();
+    std::cout << stats << std::endl;
+  }
 endGame:
-  return 0;
+  return EXIT_SUCCESS;
 }
 
 Game::userErrors game_command(Game &game, const std::string_view command) {
@@ -269,4 +345,18 @@ void endingAnimation(Game &game) {
       }
     }
   }
+}
+
+std::string getXdgDataHome() {
+  const char *xdgDataHome = std::getenv("XDG_DATA_HOME");
+  if (xdgDataHome && *xdgDataHome) {
+    return std::string(xdgDataHome);
+  }
+
+  const char *home = std::getenv("HOME");
+  if (home && *home) {
+    return std::string(home) + "/.local/share";
+  }
+
+  return "/tmp";
 }

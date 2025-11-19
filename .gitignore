@@ -1,3 +1,4 @@
 build/
 .cache/
 save_files
+.DS_Store

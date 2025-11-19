@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 4.1.2)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-project(solitaire LANGUAGES CXX VERSION 2.2.0)
+project(solitaire LANGUAGES CXX VERSION 3.0.0)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -12,6 +12,8 @@ set(PROJECT_SOURCES
     src/SuitPile.cpp
     src/Game.cpp
     src/cardStack.cpp
+    src/stats.cpp
+    src/leaderBoard.cpp
 )
 
 add_definitions(-DPROJECT_VERSION="${PROJECT_VERSION}")
