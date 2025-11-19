@@ -259,24 +259,6 @@ void Game::refresh() {
   }
 }
 
-std::ostream &operator<<(std::ostream &cout, const Time &time) {
-  if (time.m_hours != 0) {
-    cout << time.m_hours << "h ";
-  }
-  if (time.m_minute != 0) {
-    cout << time.m_minute << "m ";
-  }
-  cout << time.m_second << "s";
-  return cout;
-}
-
-std::ostream &operator<<(std::ostream &cout, const Stats &s) {
-  cout << "The game(seed: " << s.seed << ") took "
-       << Time(s.endTime - s.startTime) << ", and was completed in "
-       << s.moveCount << " moves";
-  return cout;
-}
-
 std::ostream &operator<<(std::ostream &cout, const Game &game) {
   cout << game.m_deck << std::string(4, ' ');
   for (int i{0}; i < std::size(game.m_suitPiles); i++) {
@@ -294,18 +276,6 @@ std::ostream &operator<<(std::ostream &cout, const Game &game) {
   return cout;
 }
 
-void from_json(const nlohmann::json &j, Stats &stats) {
-  j.at("seed").get_to(stats.seed);
-  j.at("startTime").get_to(stats.startTime);
-  j.at("endTime").get_to(stats.endTime);
-  j.at("version").get_to(stats.version);
-  j.at("moveCount").get_to(stats.moveCount);
-}
-void to_json(nlohmann::json &json, const Stats &stats) {
-  json = {{"seed", stats.seed},           {"startTime", stats.startTime},
-          {"endTime", stats.endTime},     {"version", stats.version},
-          {"moveCount", stats.moveCount}, {"user", stats.user}};
-}
 void from_json(const nlohmann::json &j, Game &game) {
   j.at("stats").get_to(game.m_stats);
   j.at("deck").get_to(game.m_deck);
