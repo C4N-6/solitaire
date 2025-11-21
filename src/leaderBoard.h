@@ -3,7 +3,19 @@
 #include "stats.h"
 #include <cstddef>
 #include <filesystem>
+#include <string>
 #include <vector>
+
+template <bool (*Func)(const Stats &, const Stats &)>
+bool reverseCompare(const Stats &s1, const Stats &s2);
+bool moveCompare(const Stats &s1, const Stats &s2);
+bool timeCompare(const Stats &s1, const Stats &s2);
+bool dateCompare(const Stats &s1, const Stats &s2);
+bool usernameCompare(const Stats &s1, const Stats &s2);
+bool seedCompare(const Stats &s1, const Stats &s2);
+
+bool (*getCompareFunction(std::string functionName,
+                          bool reverse))(const Stats &, const Stats &);
 
 class LeaderBoard {
   std::vector<Stats> m_stats{};
@@ -13,10 +25,7 @@ public:
   LeaderBoard(std::filesystem::path leaderBoardFile);
 
   void add(Stats stat) { m_stats.push_back(stat); }
-  void sort(bool (*compare)(Stats &, Stats &) = [](Stats &s1,
-                                                   Stats &s2) -> bool {
-    return s1.moveCount > s2.moveCount;
-  });
+  void sort(bool (*compare)(const Stats &, const Stats &) = moveCompare);
 
   void save() const { save(m_path); };
   void save(std::filesystem::path path) const;
