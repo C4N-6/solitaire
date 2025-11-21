@@ -2,6 +2,7 @@
 
 #include "stats.h"
 #include <cstddef>
+#include <ctime>
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -25,6 +26,9 @@ public:
   LeaderBoard(std::filesystem::path leaderBoardFile);
 
   void add(Stats stat) { m_stats.push_back(stat); }
+
+  time_t getAvgTime() const;
+  float getAvgMove() const;
   void sort(bool (*compare)(const Stats &, const Stats &) = moveCompare);
 
   void save() const { save(m_path); };
