@@ -2,6 +2,7 @@
 #include "stats.h"
 #include <algorithm>
 #include <cstddef>
+#include <ctime>
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
@@ -19,6 +20,20 @@ LeaderBoard::LeaderBoard(std::filesystem::path leaderBoardFilePath) {
     m_stats = json.get<std::vector<Stats>>();
   }
   leaderBoardFile.close();
+}
+time_t LeaderBoard::getAvgTime() const {
+  int count{0};
+  for (const Stats &stat : m_stats) {
+    count += stat.endTime - stat.startTime;
+  }
+  return count / m_stats.size();
+}
+float LeaderBoard::getAvgMove() const {
+  int count{0};
+  for (const Stats &stat : m_stats) {
+    count += stat.moveCount;
+  }
+  return count / static_cast<float>(m_stats.size());
 }
 
 void LeaderBoard::sort(bool (*compare)(const Stats &, const Stats &)) {
@@ -68,7 +83,7 @@ std::string LeaderBoard::toString(size_t NUMBER_OF_GAMES_DISPLAYED,
   }
 
   if (SHOW_TIME) {
-    str << std::setw(14) << "time" << '|';
+    str << std::setw(10) << "time" << '|';
     lineSize += 15;
   }
 
@@ -110,7 +125,7 @@ std::string LeaderBoard::toString(size_t NUMBER_OF_GAMES_DISPLAYED,
     }
 
     if (SHOW_TIME) {
-      str << std::setw(14) << Time{stat.endTime - stat.startTime} << '|';
+      str << std::setw(10) << Time{stat.endTime - stat.startTime} << '|';
       addNewLine = true;
     }
 
@@ -122,7 +137,10 @@ std::string LeaderBoard::toString(size_t NUMBER_OF_GAMES_DISPLAYED,
       str << std::endl;
     }
   }
-  // TODO: display SHOW_AVERAGES
+  if (SHOW_AVERAGES) {
+    str << getAvgMove() << " average moves per game, " << Time{getAvgTime()}
+        << " average game time." << std::endl;
+  }
   return str.str();
 }
 
