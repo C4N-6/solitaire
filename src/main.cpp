@@ -55,45 +55,61 @@ int main(int argc, char *argv[]) {
       .nargs(1)
       .scan<'d', int>();
 
-  leaderBoardParser.add_argument("-a")
+  // display argument
+  argparse::ArgumentParser &displayGroup{
+      leaderBoardParser.add_group("display")};
+  displayGroup.add_argument("-a")
       .help("display the average moves and average time per game")
       .default_value(false)
       .implicit_value(true);
 
-  leaderBoardParser.add_argument("-d")
+  displayGroup.add_argument("-d")
       .help("display the day each game ended at")
       .default_value(false)
       .implicit_value(true);
 
-  leaderBoardParser.add_argument("-i")
+  displayGroup.add_argument("-i")
       .help("display the index of the games")
       .default_value(false)
       .implicit_value(true);
 
-  leaderBoardParser.add_argument("-t")
+  displayGroup.add_argument("-t")
       .help("display the time the games took to beat")
       .default_value(false)
       .implicit_value(true);
 
-  leaderBoardParser.add_argument("-m")
+  displayGroup.add_argument("-m")
       .help("display the number of moves the games took to beat")
       .default_value(false)
       .implicit_value(true);
 
-  leaderBoardParser.add_argument("-s")
+  displayGroup.add_argument("-s")
       .help("display the seed of the games")
       .default_value(false)
       .implicit_value(true);
 
-  leaderBoardParser.add_argument("-u")
+  displayGroup.add_argument("-u")
       .help("display the user name of the person who beat the games")
       .default_value(false)
       .implicit_value(true);
 
-  leaderBoardParser.add_argument("-v")
+  displayGroup.add_argument("-v")
       .help("display the version the games was beaten at")
       .default_value(false)
       .implicit_value(true);
+
+  // sorting arguments
+  argparse::ArgumentParser &sortGroup{leaderBoardParser.add_group("sort")};
+
+  sortGroup.add_argument("-r")
+      .help("reverse the sorting order of the games")
+      .default_value(false)
+      .implicit_value(true);
+
+  sortGroup.add_argument("--sort")
+      .help("how to sort past games")
+      .default_value("move")
+      .choices("move", "time", "date", "username", "seed");
 
   arg.add_subparser(leaderBoardParser);
 
@@ -118,6 +134,8 @@ int main(int argc, char *argv[]) {
   LeaderBoard leaderBoard{arg.get("--leader-board")};
 
   if (arg.is_subcommand_used(leaderBoardParser)) {
+    leaderBoard.sort(getCompareFunction(leaderBoardParser.get("--sort"),
+                                        leaderBoardParser.get<bool>("-r")));
     std::cout << leaderBoard.toString(
         leaderBoardParser.get<int>("-n"), leaderBoardParser.get<bool>("-a"),
         leaderBoardParser.get<bool>("-d"), leaderBoardParser.get<bool>("-i"),

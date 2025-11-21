@@ -21,7 +21,7 @@ LeaderBoard::LeaderBoard(std::filesystem::path leaderBoardFilePath) {
   leaderBoardFile.close();
 }
 
-void LeaderBoard::sort(bool (*compare)(Stats &, Stats &)) {
+void LeaderBoard::sort(bool (*compare)(const Stats &, const Stats &)) {
   std::sort(m_stats.begin(), m_stats.end(), compare);
 }
 
@@ -124,4 +124,55 @@ std::string LeaderBoard::toString(size_t NUMBER_OF_GAMES_DISPLAYED,
   }
   // TODO: display SHOW_AVERAGES
   return str.str();
+}
+
+template <bool (*Func)(const Stats &, const Stats &)>
+bool reverseCompare(const Stats &s1, const Stats &s2) {
+  return !Func(s1, s2);
+}
+bool moveCompare(const Stats &s1, const Stats &s2) {
+  return s1.moveCount < s2.moveCount;
+}
+bool timeCompare(const Stats &s1, const Stats &s2) {
+  return s1.endTime - s1.startTime < s2.endTime - s2.startTime;
+}
+bool dateCompare(const Stats &s1, const Stats &s2) {
+  return s1.endTime < s2.endTime;
+}
+bool usernameCompare(const Stats &s1, const Stats &s2) {
+  return s1.user.compare(s2.user) < 0;
+}
+bool seedCompare(const Stats &s1, const Stats &s2) { return s1.seed < s2.seed; }
+
+bool (*getCompareFunction(std::string functionName,
+                          bool reverse))(const Stats &, const Stats &) {
+  if (reverse) {
+    if (functionName == "move") {
+      return &reverseCompare<moveCompare>;
+    } else if (functionName == "time") {
+      return &reverseCompare<timeCompare>;
+    } else if (functionName == "date") {
+      return &reverseCompare<dateCompare>;
+    } else if (functionName == "username") {
+      return &reverseCompare<usernameCompare>;
+    } else if (functionName == "seed") {
+      return &reverseCompare<seedCompare>;
+    } else {
+      return &reverseCompare<moveCompare>;
+    }
+  } else {
+    if (functionName == "move") {
+      return &moveCompare;
+    } else if (functionName == "time") {
+      return &timeCompare;
+    } else if (functionName == "date") {
+      return &dateCompare;
+    } else if (functionName == "username") {
+      return &usernameCompare;
+    } else if (functionName == "seed") {
+      return &seedCompare;
+    } else {
+      return &moveCompare;
+    }
+  }
 }
