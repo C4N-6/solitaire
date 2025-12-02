@@ -25,6 +25,7 @@ void from_json(const nlohmann::json &j, Stats &stats) {
   j.at("endTime").get_to(stats.endTime);
   j.at("version").get_to(stats.version);
   j.at("moveCount").get_to(stats.moveCount);
+  j.at("user").get_to(stats.user);
 }
 
 void to_json(nlohmann::json &json, const Stats &stats) {
