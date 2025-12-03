@@ -1,5 +1,7 @@
 #include "leaderBoard.h"
+#include "UserName.h"
 #include "stats.h"
+
 #include <algorithm>
 #include <cstddef>
 #include <ctime>
@@ -22,18 +24,28 @@ LeaderBoard::LeaderBoard(std::filesystem::path leaderBoardFilePath) {
   leaderBoardFile.close();
 }
 time_t LeaderBoard::getAvgTime() const {
+  std::string userName{getCurrentUserName()};
   int count{0};
+  int size{0};
   for (const Stats &stat : m_stats) {
-    count += stat.endTime - stat.startTime;
+    if (stat.user == userName) {
+      count += stat.endTime - stat.startTime;
+      size++;
+    }
   }
-  return count / m_stats.size();
+  return count / size;
 }
 float LeaderBoard::getAvgMove() const {
+  std::string userName{getCurrentUserName()};
   int count{0};
+  int size{0};
   for (const Stats &stat : m_stats) {
-    count += stat.moveCount;
+    if (stat.user == userName) {
+      count += stat.moveCount;
+      size++;
+    }
   }
-  return count / static_cast<float>(m_stats.size());
+  return count / static_cast<float>(size);
 }
 
 void LeaderBoard::sort(bool (*compare)(const Stats &, const Stats &)) {
