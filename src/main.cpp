@@ -177,7 +177,8 @@ int main(int argc, char *argv[]) {
 
     Game::userErrors commandError{game_command(game, command)};
     if (commandError == Game::userErrors::command_not_found &&
-        command.at(0) == 'q') {
+            command.at(0) == 'q' ||
+        std::cin.eof()) {
       goto endGame;
     } else if (commandError != Game::userErrors::no_error) {
       std::cout << command << ": " << errorToString(commandError) << std::endl;
