@@ -179,7 +179,8 @@ int main(int argc, char *argv[]) {
     if (commandError == Game::userErrors::command_not_found &&
             command.at(0) == 'q' ||
         std::cin.eof()) {
-      goto endGame;
+      clearPreviousLines(1);
+      std::exit(0);
     } else if (commandError != Game::userErrors::no_error) {
       std::cout << command << ": " << errorToString(commandError) << std::endl;
     }
@@ -191,7 +192,6 @@ int main(int argc, char *argv[]) {
     leaderBoard.save();
     std::cout << stats << std::endl;
   }
-endGame:
   return EXIT_SUCCESS;
 }
 
