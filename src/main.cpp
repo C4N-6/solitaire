@@ -5,14 +5,13 @@
 
 #include <argparse/argparse.hpp>
 #include <cctype>
-#include <chrono>
 #include <cstddef>
 #include <cstdlib>
-#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <ostream>
-#include <string>
+#include <readline/history.h>
+#include <readline/readline.h>
 #include <thread>
 
 const std::string PROGRAM_DESCRIPTION{
@@ -168,22 +167,32 @@ int main(int argc, char *argv[]) {
 
   // main loop
 
+  char *input;
   std::cout << game << std::endl;
+
   while (!game.isGameOver()) {
-    std::string command{};
-    std::cin.sync();
-    std::cout << ':';
-    std::getline(std::cin, command);
+    input = readline(":");
+
+    if (*input) {
+      add_history(input);
+    }
+
+    std::string command;
+    if (!input) {
+      command = "q";
+    } else {
+      command = (input);
+    }
 
     Game::userErrors commandError{game_command(game, command)};
     if (commandError == Game::userErrors::command_not_found &&
-            command.at(0) == 'q' ||
-        std::cin.eof()) {
+        command.at(0) == 'q') {
       clearPreviousLines(1);
       std::exit(0);
     } else if (commandError != Game::userErrors::no_error) {
       std::cout << command << ": " << errorToString(commandError) << std::endl;
     }
+    free(input);
   }
   endingAnimation(game);
   {

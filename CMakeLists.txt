@@ -1,7 +1,13 @@
 cmake_minimum_required(VERSION 4.1.2)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-project(solitaire LANGUAGES CXX VERSION 3.2.3)
+project(solitaire LANGUAGES CXX VERSION 4.0.0)
+
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(READLINE REQUIRED IMPORTED_TARGET readline)
+
+find_package(nlohmann_json REQUIRED)
+find_package(argparse REQUIRED)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -19,6 +25,14 @@ set(PROJECT_SOURCES
 add_definitions(-DPROJECT_VERSION="${PROJECT_VERSION}")
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
+
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    PkgConfig::READLINE
+    nlohmann_json::nlohmann_json
+    argparse::argparse
+)
+
+target_include_directories(${PROJECT_NAME} PRIVATE ${READLINE_INCLUDE_DIRS})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:DEBUG>)
 
