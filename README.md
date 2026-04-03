@@ -12,6 +12,7 @@ A program to play solitaire
 
 - [argparse/argparse](https://github.com/p-ranav/argparse)
 - [nlohmann/json](https://github.com/nlohmann/json)
+- [gnu readline](https://tiswww.cwru.edu/php/chet/readline/rltop.html)
 
 ## Build
 
