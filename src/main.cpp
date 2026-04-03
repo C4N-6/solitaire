@@ -173,13 +173,20 @@ int main(int argc, char *argv[]) {
   while (!game.isGameOver()) {
     input = readline(":");
 
-    if (*input) {
+    if (input && *input) {
       add_history(input);
     }
 
     std::string command;
     if (!input) {
       command = "q";
+    } else if (input[0] == '\0') {
+      if (history_length > 0) {
+        HIST_ENTRY *last = history_get(history_base + history_length - 1);
+        if (last) {
+          command = last->line;
+        }
+      }
     } else {
       command = (input);
     }
